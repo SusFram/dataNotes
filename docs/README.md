@@ -3,5 +3,5 @@
 Miscellaneous analysis
 
  * Public EV charging sites mapped:
-    * [Suffolk](evChargePoints_Hampshire_v1.html)
+    * [Suffolk](evChargePoints_Suffolk_v1.html)
     * [Hampshire](evChargePoints_Hampshire_v1.html)
