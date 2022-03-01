@@ -34,6 +34,8 @@ Data last updated: `r max(dt$lastUpdated, na.rm = TRUE)`
 
 Data last downloaded: `r Sys.time()`
 
+# Map
+
 ```{r map, fig.cap="Registered public charge points"}
 # Map filtered
 # this may look odd if the filter string is non-specific
@@ -56,4 +58,16 @@ map %>% addTiles() %>%
 
 # %>% addMiniMap("topright") # gets in the way
 
+```
+
+# Status
+
+(According to the registry data)
+
+```{r statusTable}
+t <- dataSubset[, .(nChargers = .N), keyby = .(chargeDeviceStatus,deviceOwnerName, deviceControllerName)]
+
+tt <- dcast(t, deviceOwnerName + deviceControllerName ~ chargeDeviceStatus)
+
+makeFlexTable(tt, cap = "Status")
 ```
