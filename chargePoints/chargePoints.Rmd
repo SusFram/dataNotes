@@ -1,0 +1,59 @@
+---
+params:
+  county: ""
+title: "EV Charging Points"
+subtitle: '`r params$county`'
+author: "Ben Anderson"
+date: 'Last run at: `r Sys.time()`'
+output:
+  bookdown::html_document2:
+    code_folding: hide
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: TRUE
+linkcolor: blue
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+
+library(sf)
+library(leaflet)
+
+# for testing 
+filterStr <- "Suffolk"
+filterStr <- params$county
+dataSubset <- dt[county %like% filterStr]
+```
+
+Data: https://data.openenergy.org.uk/dataset/national-chargepoint-registry
+
+Data last updated: `r max(dt$lastUpdated, na.rm = TRUE)`
+
+Data last downloaded: `r Sys.time()`
+
+```{r map, fig.cap="Registered public charge points"}
+# Map filtered
+# this may look odd if the filter string is non-specific
+
+pal <- colorNumeric(
+  palette = "Reds",
+  domain = dataSubset$meankW)
+
+map <- leaflet(dataSubset) %>% addCircles(lng = ~longitude, lat = ~latitude, 
+                                       color = ~pal(meankW),
+                                       popup = ~paste0("Location: ", town," (",name,")","<br>",
+                                                       "N chargers: ", nChargers, "<br>",
+                                                       "Power: ", minkW, " - ", maxkW, " kW" )
+                                       )
+map %>% addTiles() %>%
+  addLegend("bottomright", pal = pal, values = ~meankW,
+            title = "Mean kW at site",
+            opacity = 1
+  ) 
+
+# %>% addMiniMap("topright") # gets in the way
+
+```
