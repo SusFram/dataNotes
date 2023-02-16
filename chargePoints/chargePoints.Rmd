@@ -44,12 +44,37 @@ pal <- colorNumeric(
   palette = "Reds",
   domain = dataSubset$meankW)
 
-map <- leaflet(dataSubset) %>% addCircles(lng = ~longitude, lat = ~latitude, 
-                                       color = ~pal(meankW),
-                                       popup = ~paste0("Location: ", town," (",name,")","<br>",
+getColor <- function(df) {
+  sapply(df$meankW, function(meankW) {
+  if(meankW <= 25) {
+    "green"
+  } else if(meankW <= 50) {
+    "orange"
+  } else {
+    "red"
+  } })
+}
+
+icons <- awesomeIcons(
+  icon = 'ios-close',
+  iconColor = 'black',
+  library = 'ion',
+  markerColor = getColor(dataSubset)
+)
+
+map <- leaflet(dataSubset) %>% 
+  # addCircles(lng = ~longitude, lat = ~latitude,
+  #            color = ~pal(meankW),
+  #            radius = ~sqrt(meankW*50),
+  #            popup = ~paste0("Location: ", town," (",name,")","<br>",
+  #                            "N chargers: ", nChargers, "<br>",
+  #                            "Power: ", minkW, " - ", maxkW, " kW" )
+  #            ) # %>%
+  addMarkers(~longitude, ~latitude, popup = ~paste0("Location: ", town," (",name,")","<br>",
                                                        "N chargers: ", nChargers, "<br>",
-                                                       "Power: ", minkW, " - ", maxkW, " kW" )
-                                       )
+                                                       "Power: ", minkW, " - ", maxkW, " kW" ),
+             icon=icons,
+             label = ~as.character(name))
 map %>% addTiles() %>%
   addLegend("bottomright", pal = pal, values = ~meankW,
             title = "Mean kW at site",
